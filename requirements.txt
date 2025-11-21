@@ -1,0 +1,14 @@
+# Core ORSO I/O + model language
+orsopy @ git+https://github.com/reflectivity/orsopy.git
+
+# Optional but strongly recommended (needed for lipid constants)
+molgroups
+
+# Used optionally by molgroups for nSL calculations
+numpy
+
+# For parsing ORSO YAML model definitions (comes via orsopy)
+pyyaml
+
+# For your CLI and filesystem structure (standard library)
+# (no need to list argparse or pathlib)

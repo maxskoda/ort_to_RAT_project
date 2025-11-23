@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: ./insert_model_stack.sh file.ort "Si | (SiO2 1.5) | (Cr 5.0) | (Au 20.0) | D2O"
+# Usage: ./insert_model_stack.sh file.ort "Si | (SiO2 1.5) | ..."
 
 FILE="$1"
 STACK="$2"
@@ -9,14 +9,26 @@ if [[ -z "$FILE" || -z "$STACK" ]]; then
     exit 1
 fi
 
-# Backup
 cp "$FILE" "$FILE.bak"
 
 awk -v stack="$STACK" '
-    BEGIN { inserted = 0 }
+    BEGIN {
+        in_sample = 0
+        inserted = 0
+    }
 
-    # Detect the exact line: "#     name: ..."
-    /^# *name:/ {
+    # Detect start of the sample section
+    /^# *sample:/ {
+        in_sample = 1
+    }
+
+    # Detect other top-level headers → exit sample section
+    /^# *(experiment:|measurement:|data_source:)/ && !/^# *sample:/ {
+        in_sample = 0
+    }
+
+    # We only react to the *sample* name:
+    in_sample == 1 && /^# *name:/ {
         print
         if (!inserted) {
             print "#     model:"
